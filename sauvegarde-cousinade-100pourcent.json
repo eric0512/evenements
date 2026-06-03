@@ -1,0 +1,157 @@
+{
+  "evenements": [
+    {
+      "id": "1780470560331",
+      "titre": "Cousinade 2026",
+      "date": "2026-06-05",
+      "cotisationMontant": 100,
+      "participants": [
+        {
+          "id": "1780470597850",
+          "nom": "XARDEL",
+          "prenom": "André",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470613215"
+        },
+        {
+          "id": "1780470613215",
+          "nom": "XARDEL",
+          "prenom": "Lili",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470597850"
+        },
+        {
+          "id": "1780470635203",
+          "nom": "FISCHER",
+          "prenom": "Eric",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470649672"
+        },
+        {
+          "id": "1780470649672",
+          "nom": "FISCHER",
+          "prenom": "Karin",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470635203"
+        },
+        {
+          "id": "1780470671294",
+          "nom": "BOIRON",
+          "prenom": "Christian",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470687623"
+        },
+        {
+          "id": "1780470687623",
+          "nom": "BOIRON",
+          "prenom": "Béa ",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470671294"
+        },
+        {
+          "id": "1780470708060",
+          "nom": "CHENU",
+          "prenom": "Jean Louis",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470721048"
+        },
+        {
+          "id": "1780470721048",
+          "nom": "CHENU",
+          "prenom": "Bea",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470708060"
+        },
+        {
+          "id": "1780470741815",
+          "nom": "XARDEL",
+          "prenom": "René-Pierre",
+          "isEnfant": false,
+          "cotisationReglee": true
+        },
+        {
+          "id": "1780470754314",
+          "nom": "ZAMUNER",
+          "prenom": "Patrick",
+          "isEnfant": false,
+          "cotisationReglee": true
+        },
+        {
+          "id": "1780470777318",
+          "nom": "XARDEL",
+          "prenom": "Serge",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470794304"
+        },
+        {
+          "id": "1780470794304",
+          "nom": "XARDEL",
+          "prenom": "Aurelie",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470777318"
+        },
+        {
+          "id": "1780470851941",
+          "nom": "FISCHER",
+          "prenom": "Claude",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470866843"
+        },
+        {
+          "id": "1780470866843",
+          "nom": "FISCHER",
+          "prenom": "Fabienne",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780470851941"
+        },
+        {
+          "id": "1780470937601",
+          "nom": "XARDEL",
+          "prenom": "Sandrine",
+          "isEnfant": false,
+          "cotisationReglee": true
+        },
+        {
+          "id": "1780471869526",
+          "nom": "BOIRON",
+          "prenom": "Christophe",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780471889526"
+        },
+        {
+          "id": "1780471889526",
+          "nom": "BOIRON",
+          "prenom": "Vanessa",
+          "isEnfant": false,
+          "cotisationReglee": true,
+          "coupleAvecId": "1780471869526"
+        },
+        {
+          "id": "1780471913361",
+          "nom": "BOIRON",
+          "prenom": "Nolan ",
+          "isEnfant": true,
+          "cotisationReglee": false,
+          "parentIds": [
+            "1780471869526",
+            "1780471889526"
+          ]
+        }
+      ],
+      "depenses": []
+    }
+  ]
+}

@@ -14,6 +14,7 @@ export interface Depense {
   montant: number;
   date: string;
   categorie?: string;
+  justificatif?: string; // Image en Base64 compressée
 }
 
 export interface Evenement {
