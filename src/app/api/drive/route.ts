@@ -1,5 +1,10 @@
 import { NextResponse } from 'next/server';
 import { google } from 'googleapis';
+import fs from 'fs';
+import path from 'path';
+
+// Chemin d'accès local Google Drive (via l'application Google Drive pour PC)
+const LOCAL_DRIVE_PATH = 'G:\\Mon Drive\\Appli evenements\\sauvegarde-cousinade-100pourcent.json';
 
 // Fonction d'authentification avec Google Drive API
 function getDriveClient() {
@@ -27,7 +32,7 @@ function getDriveClient() {
 }
 
 // Nom du fichier de données stocké sur Drive
-const DATA_FILE_NAME = 'evenements_data.json';
+const DATA_FILE_NAME = 'sauvegarde-cousinade-100pourcent.json';
 
 // Trouver ou créer le fichier data.json sur Google Drive
 async function getOrCreateFile(drive: any, folderId?: string) {
@@ -74,6 +79,18 @@ async function getOrCreateFile(drive: any, folderId?: string) {
 
 export async function GET() {
   try {
+    // 1. Tenter de lire directement depuis le dossier Google Drive local (G:\) si disponible
+    if (fs.existsSync(LOCAL_DRIVE_PATH)) {
+      try {
+        const fileContent = fs.readFileSync(LOCAL_DRIVE_PATH, 'utf-8');
+        const parsed = JSON.parse(fileContent);
+        return NextResponse.json({ evenements: parsed.evenements || parsed, isDemo: false });
+      } catch (localError) {
+        console.error('Erreur lors de la lecture du fichier local G:\\', localError);
+      }
+    }
+
+    // 2. Fallback sur l'API Google Drive Cloud
     const { drive, folderId } = getDriveClient();
     const fileId = await getOrCreateFile(drive, folderId);
 
@@ -85,31 +102,60 @@ export async function GET() {
 
     return NextResponse.json(fileResponse.data);
   } catch (error: any) {
-    console.error('Erreur de lecture Google Drive:', error);
-    // Si l'intégration n'est pas encore configurée (environnement local), on renvoie un état simulé en local
+    console.warn('Google Drive Cloud non configuré ou inaccessible, utilisation du localStorage local (Mode Démo) :', error.message);
+    
+    // Si le dossier G:\ existe mais que le fichier n'a pas encore été créé
+    const parentDir = path.dirname(LOCAL_DRIVE_PATH);
+    if (fs.existsSync(parentDir)) {
+      return NextResponse.json(
+        { isDemo: false, evenements: [] },
+        { status: 200 }
+      );
+    }
+
     return NextResponse.json(
       { error: error.message, isDemo: true, evenements: [] },
-      { status: 200 } // Statut 200 pour permettre une utilisation démo en local sans planter l'UI
+      { status: 200 }
     );
   }
 }
 
 export async function POST(request: Request) {
   try {
-    const { drive, folderId } = getDriveClient();
-    const fileId = await getOrCreateFile(drive, folderId);
     const body = await request.json();
+    let localSaved = false;
 
-    // Mise à jour du fichier sur Google Drive
-    await drive.files.update({
-      fileId: fileId,
-      media: {
-        mimeType: 'application/json',
-        body: JSON.stringify(body, null, 2),
-      },
-    });
+    // 1. Tenter d'écrire directement dans le dossier Google Drive local (G:\) si disponible
+    const parentDir = path.dirname(LOCAL_DRIVE_PATH);
+    if (fs.existsSync(parentDir)) {
+      try {
+        fs.writeFileSync(LOCAL_DRIVE_PATH, JSON.stringify(body, null, 2), 'utf-8');
+        localSaved = true;
+      } catch (localError) {
+        console.error('Erreur lors de l\'écriture du fichier local G:\\', localError);
+      }
+    }
 
-    return NextResponse.json({ success: true });
+    // 2. Tenter d'écrire aussi sur le Cloud si configuré
+    try {
+      const { drive, folderId } = getDriveClient();
+      const fileId = await getOrCreateFile(drive, folderId);
+
+      await drive.files.update({
+        fileId: fileId,
+        media: {
+          mimeType: 'application/json',
+          body: JSON.stringify(body, null, 2),
+        },
+      });
+      return NextResponse.json({ success: true });
+    } catch (cloudError) {
+      if (localSaved) {
+        // Si sauvé en local mais cloud non configuré, c'est un succès local
+        return NextResponse.json({ success: true, localOnly: true });
+      }
+      throw cloudError;
+    }
   } catch (error: any) {
     console.error('Erreur d\'écriture Google Drive:', error);
     return NextResponse.json(
