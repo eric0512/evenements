@@ -29,6 +29,8 @@ export default function Home() {
   const [saving, setSaving] = useState<boolean>(false);
   const [errorMsg, setErrorMsg] = useState<string>('');
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
+  const [editingCotisation, setEditingCotisation] = useState<boolean>(false);
+  const [tempCotisation, setTempCotisation] = useState<number>(0);
 
   // Form states for Event creation
   const [newEventTitre, setNewEventTitre] = useState('');
@@ -179,6 +181,25 @@ export default function Home() {
     } else if (updated.length === 0) {
       setSelectedEvenementId('');
     }
+  };
+
+  const startEditingCotisation = () => {
+    if (!selectedEvent) return;
+    setTempCotisation(selectedEvent.cotisationMontant);
+    setEditingCotisation(true);
+  };
+
+  const handleUpdateCotisation = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!selectedEvent) return;
+    const updatedEvents = evenements.map(evt => {
+      if (evt.id === selectedEvent.id) {
+        return { ...evt, cotisationMontant: Number(tempCotisation) };
+      }
+      return evt;
+    });
+    await saveData(updatedEvents);
+    setEditingCotisation(false);
   };
 
   // 2. Participant Handlers
@@ -666,7 +687,34 @@ export default function Home() {
               <div className="bg-slate-900/40 border border-slate-800/80 rounded-2xl p-4.5 flex flex-wrap gap-4 justify-between items-center">
                 <div>
                   <h2 className="text-lg font-bold text-white">{selectedEvent.titre}</h2>
-                  <p className="text-xs text-slate-400 mt-0.5">Le {selectedEvent.date} — Cotisation fixée à {selectedEvent.cotisationMontant} € par adulte.</p>
+                  {editingCotisation ? (
+                    <form onSubmit={handleUpdateCotisation} className="flex items-center gap-2 mt-1">
+                      <span className="text-xs text-slate-400">Cotisation :</span>
+                      <input 
+                        type="number" 
+                        value={tempCotisation} 
+                        onChange={(e) => setTempCotisation(Number(e.target.value))}
+                        className="bg-slate-900 border border-slate-700 rounded px-2 py-0.5 text-xs text-white w-20 focus:outline-none focus:border-indigo-500"
+                        min="0"
+                        required
+                        autoFocus
+                      />
+                      <button type="submit" className="bg-indigo-600 hover:bg-indigo-500 text-white text-[10px] px-2 py-1 rounded">Valider</button>
+                      <button type="button" onClick={() => setEditingCotisation(false)} className="bg-slate-800 hover:bg-slate-750 text-slate-300 text-[10px] px-2 py-1 rounded">Annuler</button>
+                    </form>
+                  ) : (
+                    <p className="text-xs text-slate-400 mt-0.5">
+                      Le {selectedEvent.date} — Cotisation fixée à{" "}
+                      <span 
+                        onClick={startEditingCotisation}
+                        className="font-bold text-indigo-400 underline cursor-pointer decoration-dotted hover:text-indigo-300 animate-pulse"
+                        title="Cliquez pour modifier le montant de la cotisation"
+                      >
+                        {selectedEvent.cotisationMontant} €
+                      </span>{" "}
+                      par adulte.
+                    </p>
+                  )}
                 </div>
                 <div className="flex gap-4">
                   <div className="text-center">
