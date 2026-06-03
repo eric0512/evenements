@@ -17,7 +17,9 @@ import {
   Info,
   Calendar,
   AlertTriangle,
-  FolderOpen
+  FolderOpen,
+  Download,
+  Upload
 } from 'lucide-react';
 
 export default function Home() {
@@ -45,6 +47,41 @@ export default function Home() {
   const [newDepTitre, setNewDepTitre] = useState('');
   const [newDepMontant, setNewDepMontant] = useState(0);
   const [newDepCategorie, setNewDepCategorie] = useState('Autre');
+
+  // Backup Handlers (Import / Export JSON)
+  const handleExportBackup = () => {
+    const dataStr = "data:text/json;charset=utf-8," + encodeURIComponent(JSON.stringify({ evenements }, null, 2));
+    const downloadAnchor = document.createElement('a');
+    downloadAnchor.setAttribute("href", dataStr);
+    downloadAnchor.setAttribute("download", "antigravity_evenements_backup.json");
+    document.body.appendChild(downloadAnchor);
+    downloadAnchor.click();
+    downloadAnchor.remove();
+  };
+
+  const handleImportBackup = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const fileReader = new FileReader();
+    const files = e.target.files;
+    if (!files || files.length === 0) return;
+    
+    fileReader.onload = async (event) => {
+      try {
+        const parsed = JSON.parse(event.target?.result as string);
+        if (parsed && Array.isArray(parsed.evenements)) {
+          await saveData(parsed.evenements);
+          if (parsed.evenements.length > 0) {
+            setSelectedEvenementId(parsed.evenements[0].id);
+          }
+          alert("Sauvegarde importée avec succès !");
+        } else {
+          alert("Format de fichier invalide. Le fichier doit contenir un tableau 'evenements'.");
+        }
+      } catch (err) {
+        alert("Erreur lors de la lecture du fichier de sauvegarde.");
+      }
+    };
+    fileReader.readAsText(files[0]);
+  };
 
   // Load data from API (Google Drive) or fallback to LocalStorage
   useEffect(() => {
@@ -387,6 +424,29 @@ export default function Home() {
               <RefreshCw className="h-3.5 w-3.5 animate-spin" /> Sauvegarde...
             </span>
           )}
+
+          {/* Backup Buttons */}
+          <div className="flex items-center gap-2 border-l border-slate-800 pl-3">
+            <button 
+              onClick={handleExportBackup}
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-indigo-600 hover:bg-indigo-500 text-white transition duration-200"
+              title="Exporter les données en fichier JSON"
+            >
+              <Download className="h-3.5 w-3.5" /> Exporter
+            </button>
+            <label 
+              className="flex items-center gap-1.5 px-3 py-1.5 rounded-lg text-xs font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition duration-200 cursor-pointer"
+              title="Importer des données depuis un fichier JSON"
+            >
+              <Upload className="h-3.5 w-3.5" /> Importer
+              <input 
+                type="file" 
+                accept=".json" 
+                onChange={handleImportBackup} 
+                className="hidden" 
+              />
+            </label>
+          </div>
         </div>
       </header>
 
@@ -498,16 +558,15 @@ export default function Home() {
           {/* Guide Google Drive Configuration */}
           <div className="bg-slate-900/60 border border-slate-800 rounded-2xl p-4 flex flex-col gap-3 shadow-xl">
             <h3 className="text-xs font-semibold tracking-wide uppercase text-slate-400 flex items-center gap-1.5">
-              <FolderOpen className="h-4 w-4 text-indigo-400" /> Synchro Cloud
+              <FolderOpen className="h-4 w-4 text-indigo-400" /> Sauvegarde Drive
             </h3>
             <p className="text-[11px] text-slate-400 leading-relaxed">
-              Pour activer la sauvegarde sur <strong>Google Drive</strong>, configurez ces variables d'environnement sur Vercel :
+              Pour sauvegarder vos données sur votre Google Drive :
             </p>
-            <ul className="text-[10px] space-y-1 bg-slate-950/60 p-2.5 rounded-lg border border-slate-800/50 font-mono text-indigo-300">
-              <li>GOOGLE_CLIENT_EMAIL</li>
-              <li>GOOGLE_PRIVATE_KEY</li>
-              <li>GOOGLE_DRIVE_FOLDER_ID</li>
-            </ul>
+            <ol className="text-[11px] space-y-1.5 text-slate-300 list-decimal pl-4">
+              <li>Cliquez sur le bouton <strong>Exporter</strong> ci-dessus pour télécharger le fichier de sauvegarde.</li>
+              <li>Glissez-déposez le fichier téléchargé dans votre dossier Google Drive <strong>Appli gwen</strong> ou <strong>Appli evenements</strong>.</li>
+            </ol>
           </div>
         </section>
 
