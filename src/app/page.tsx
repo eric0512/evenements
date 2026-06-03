@@ -1,6 +1,6 @@
 'use client';
 
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useRef } from 'react';
 import { Evenement, Participant, Depense } from '@/types';
 import { 
   Users, 
@@ -31,6 +31,16 @@ export default function Home() {
   const [isDemoMode, setIsDemoMode] = useState<boolean>(false);
   const [editingCotisation, setEditingCotisation] = useState<boolean>(false);
   const [tempCotisation, setTempCotisation] = useState<number>(0);
+
+  const detailsRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (selectedEvenementId && typeof window !== 'undefined' && window.innerWidth < 1024) {
+      setTimeout(() => {
+        detailsRef.current?.scrollIntoView({ behavior: 'smooth' });
+      }, 100);
+    }
+  }, [selectedEvenementId]);
 
   // Form states for Event creation
   const [newEventTitre, setNewEventTitre] = useState('');
@@ -592,7 +602,7 @@ export default function Home() {
         </section>
 
         {/* Right Columns: Main Event Panel */}
-        <section className="lg:col-span-3 flex flex-col gap-6">
+        <section ref={detailsRef} className="lg:col-span-3 flex flex-col gap-6">
           {errorMsg && (
             <div className="bg-rose-500/10 border border-rose-500/20 text-rose-400 p-3.5 rounded-xl text-sm flex items-center gap-2">
               <AlertTriangle className="h-4 w-4 shrink-0" />
