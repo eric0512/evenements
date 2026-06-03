@@ -216,10 +216,20 @@ export default function Home() {
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
             {evenements.length === 0 ? (
-              <div className="col-span-1 md:col-span-2 text-center py-10 bg-slate-900/40 rounded-xl border border-dashed border-slate-800">
-                <Calendar className="h-10 w-10 text-slate-600 mx-auto mb-3" />
-                <p className="text-slate-400">Aucun événement créé.</p>
-                <p className="text-sm text-slate-500 mt-1">Créez votre premier événement pour commencer.</p>
+              <div className="col-span-1 md:col-span-2 text-center py-10 bg-slate-900/40 rounded-xl border border-dashed border-slate-800 flex flex-col items-center">
+                <Calendar className="h-10 w-10 text-slate-600 mb-3" />
+                <p className="text-slate-400">Aucun événement trouvé.</p>
+                <p className="text-sm text-slate-500 mt-1 mb-6">Créez votre premier événement ou importez une sauvegarde.</p>
+                
+                <label className="flex items-center gap-2 px-5 py-2.5 rounded-lg text-sm font-semibold bg-slate-800 hover:bg-slate-700 text-slate-200 transition duration-200 cursor-pointer shadow-lg">
+                  <Upload className="h-4 w-4" /> Importer depuis mon appareil
+                  <input 
+                    type="file" 
+                    accept=".json" 
+                    onChange={handleImportBackup} 
+                    className="hidden" 
+                  />
+                </label>
               </div>
             ) : (
               evenements.map(evt => (
